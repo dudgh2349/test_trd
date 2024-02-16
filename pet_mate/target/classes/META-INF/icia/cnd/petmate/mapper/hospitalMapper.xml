@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.cnd.petmate.mapper.HospitalMapperInter">
+
+
+<insert id="insertStoreReservation" parameterType="map">
+    INSERT INTO TT(TT_STCODE, TT_DATE, TT_TIME)
+    VALUES (#{storeCode},#{reserveDate},#{reserveTime})
+</insert>
+
+
+
+
+
+
+
+
+</mapper>

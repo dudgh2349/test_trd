@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.cnd.petmate.mapper.BoardMapperInter">
+
+
+    <insert id="insBoardA" parameterType="icia.cnd.petmate.beans.StoreBean">
+		INSERT INTO BB(BB_USCODE, BB_CODE, BB_TITLE, BB_DATE, BB_NOTE, BB_IMCODE)
+		VALUES(#{storeCode},'A'||BOARD_CODE.NEXTVAL,#{boardList[0].boardTitle},SYSDATE,#{boardList[0].boardContent},#{boardList[0].images})
+	</insert>
+	
+	
+	<select id="boardList" resultType="icia.cnd.petmate.beans.BoardBean">
+		SELECT US.US_NAME AS images, BB.BB_CODE AS boardCode, BB.BB_TITLE AS boardTitle, BB.BB_DATE AS boardDate, BB.BB_NOTE AS boardContent
+        FROM BB INNER JOIN US ON BB.BB_USCODE = US.US_CODE ORDER BY BB.BB_DATE DESC
+	</select>
+
+	<insert id="insBoardB" parameterType="icia.cnd.petmate.beans.UserBean">
+		INSERT INTO BB(BB_USCODE, BB_CODE, BB_TITLE, BB_DATE, BB_NOTE, BB_IMCODE)
+		VALUES(#{userCode},'A'||BOARD_CODE.NEXTVAL, #{boardList[0].boardTitle}, SYSDATE, #{boardList[0].boardContent}, #{boardList[0].images})
+	</insert>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

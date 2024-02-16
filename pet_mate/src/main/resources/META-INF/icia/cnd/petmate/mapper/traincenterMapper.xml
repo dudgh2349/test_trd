@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.cnd.petmate.mapper.TrainCenterMapperInter">
+
+<resultMap id="getPetNameMap" type="icia.cnd.petmate.beans.ReserveResultBean">
+  <result property="rePtName" column="rePtName"/>
+  <result property="reDate" column="reDate"/>
+</resultMap>
+<select id="getPetCode" parameterType="icia.cnd.petmate.beans.UserBean" resultType="String">
+	SELECT PT_CODE AS petCode FROM PET WHERE PT_NAME=#{petInfoList[0].petName}
+</select>
+<select id="getAddCode" parameterType="icia.cnd.petmate.beans.UserBean" resultType="String">
+	SELECT AD_CODE AS staddCode FROM ADDBOARD WHERE AD_NOTE=#{storeList[0].staddContent} AND AD_STCODE=#{storeList[0].stCode}
+</select>
+<select id="getStName" parameterType="icia.cnd.petmate.beans.UserBean" resultType="String">
+	SELECT ST_NAME AS stName FROM STORE WHERE ST_CODE=#{storeList[0].stCode}
+</select>
+<insert id="insReserve" parameterType="icia.cnd.petmate.beans.UserBean">
+	INSERT INTO RE(RE_STCODE, RE_USCODE, RE_ADCODE, RE_PTCODE, RE_TIME, RE_DATE)
+	VALUES(#{storeList[0].stCode}, #{userCode}, #{storeList[0].staddCode}, #{petInfoList[0].petCode}, #{timeList[0].reserveTime}, SYSDATE)
+</insert>
+<select id="getPetName" parameterType="icia.cnd.petmate.beans.StoreBean" resultMap="getPetNameMap">
+	 SELECT PET.PT_NAME AS rePtName, RE.RE_DATE AS reDate
+FROM RE
+JOIN PET
+ON RE.RE_USCODE=PET.PT_USCODE AND RE.RE_PTCODE=PET.PT_CODE
+WHERE RE_STCODE=#{storeCode}
+</select>
+<select id="getPetUser" parameterType="icia.cnd.petmate.beans.UserBean" resultType="String">
+	SELECT USERS.US_NAME AS userName
+	FROM PET
+	INNER JOIN USERS
+	ON USERS.US_CODE=PET.PT_USCODE
+	WHERE PET.PT_NAME=#{petInfoList[0].petName}
+</select>
+
+<select id="selectPetCode" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="String">
+	SELECT PET.PT_CODE AS reUsPetCode
+	FROM PET
+	WHERE PET.PT_NAME=#{reserveList[0].rePetName}
+</select>
+<select id="selectUserCode" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="String">
+	SELECT US_CODE AS reUsCode
+	FROM USERS
+	WHERE US_NAME=#{reserveList[0].reUsName}
+</select>
+<insert id="insTrDiary" parameterType="icia.cnd.petmate.beans.StoreBean">
+	INSERT INTO TC(TC_STCODE, TC_USCODE, TC_PTCODE, TC_DATE, TC_TITLE, TC_NOTE)
+	VALUES(#{storeCode}, #{reserveList[0].reUsCode}, #{reserveList[0].reUsPetCode}, #{addList[0].addDate}, #{addList[0].addTitle}, #{addList[0].addContent})
+</insert>
+<select id="selectTrDiaryList" parameterType="icia.cnd.petmate.beans.StoreBean" resultMap="promotionResultMap">
+    SELECT
+        ST.ST_CODE AS reStCode,
+        ST.ST_NAME AS reStName,
+        US.US_NAME AS reUsName,
+        PET.PT_NAME AS rePetName,
+        TC.TC_DATE AS addDate,
+        TC.TC_TITLE AS addTitle,
+        TC.TC_NOTE AS addContent
+    FROM TC 
+    INNER JOIN ST ON ST.ST_CODE = TC.TC_STCODE
+    INNER JOIN US ON US.US_CODE = TC.TC_USCODE
+    INNER JOIN PET ON PET.PT_CODE = TC.TC_PTCODE
+    WHERE TC.TC_STCODE = #{storeCode}
+</select>
+
+<resultMap id="promotionResultMap" type="icia.cnd.petmate.beans.PromotionBean">
+    <result property="addCode" column="addCode"/>
+    <result property="addTitle" column="addTitle"/>
+    <result property="addSubTitle" column="addSubTitle"/>
+    <result property="addContent" column="addContent"/>
+    <result property="addPrice" column="addPrice"/>
+    <result property="addImages" column="addImages"/>
+    <result property="addDate" column="addDate"/>
+    <association property="addReserveList" javaType="java.util.ArrayList" resultMap="reserveResultMap"/>
+</resultMap>
+
+
+<resultMap id="reserveResultMap" type="icia.cnd.petmate.beans.ReserveBean">
+    <result property="reStCode" column="reStCode"/>
+    <result property="reStName" column="reStName"/>
+    <result property="reUsName" column="reUsName"/>
+    <result property="rePetName" column="rePetName"/>
+    <result property="reUsPetCode" column="reUsPetCode"/>
+</resultMap>
+
+<select id="getReserveInfo" parameterType="icia.cnd.petmate.beans.UserBean" resultMap="reserveMap">
+    	SELECT RE_TIME AS reTime, RE_DATE AS reDate, ST.ST_NAME AS reStName, 
+               ST.ST_ADDRESS AS reStAddress, PET.PT_NAME AS rePtName
+    	FROM RE
+    	INNER JOIN ST
+        ON RE.RE_STCODE=ST.ST_CODE
+        INNER JOIN PET
+ 		ON RE.RE_USCODE=PET.PT_USCODE
+    	WHERE RE.RE_USCODE=#{userCode}
+    </select>
+    <resultMap type="icia.cnd.petmate.beans.ReserveResultBean" id="reserveMap">
+        	<result property="reTime" column="reTime" />
+        	<result property="reDate" column="reDate" />
+        	<result property="reStName" column="reStName" />
+        	<result property="reStAddress" column="reStAddress" />
+        	<result property="rePtName" column="rePtName" />
+    </resultMap>
+
+
+
+
+
+
+
+
+</mapper>

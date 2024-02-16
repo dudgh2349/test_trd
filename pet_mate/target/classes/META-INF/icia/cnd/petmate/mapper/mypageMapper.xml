@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.cnd.petmate.mapper.MypageMapperInter">
+
+
+
+
+
+<insert id="insHealth" parameterType="icia.cnd.petmate.beans.UserBean">
+	INSERT INTO HD(HD_USCODE, HD_PTCODE, HD_DATE, HD_NOTE, HD_WEIGHT, HD_EYE, HD_TOOTH, HD_PIPI, HD_SKIN, HD_HAIR)
+	VALUES(#{userCode}, #{petInfoList[0].petCode}, SYSDATE, #{petInfoList[0].healthList[0].petMemo}, #{petInfoList[0].healthList[0].petWeight}, 
+	#{petInfoList[0].healthList[0].petEyes}, #{petInfoList[0].healthList[0].petTooth}, #{petInfoList[0].healthList[0].petPipi}, 
+	#{petInfoList[0].healthList[0].petSkin}, #{petInfoList[0].healthList[0].petHair})
+</insert>
+<resultMap id="healthResultMap" type="icia.cnd.petmate.beans.HealthBean">
+  <result property="healthDate" column="healthDate"/>
+  <result property="petMemo" column="petMemo"/>
+  <result property="petWeight" column="petWeight"/>
+  <result property="petEyes" column="petEyes"/>
+  <result property="petTooth" column="petTooth"/>
+  <result property="petPipi" column="petPipi"/>
+  <result property="petSkin" column="petSkin"/>
+  <result property="petHair" column="petHair"/>
+</resultMap>
+
+<select id="selPetHealth" resultMap="healthResultMap" parameterType="icia.cnd.petmate.beans.UserBean">
+	SELECT 
+	HD_DATE AS healthDate, 
+	HD_NOTE AS petMemo, 
+	HD_WEIGHT AS petWeight, 
+	HD_EYE AS petEyes, 
+	HD_TOOTH AS petTooth, 
+	HD_PIPI AS petPipi, 
+	HD_SKIN AS petSkin, 
+	HD_HAIR AS petHair
+	FROM HEALTHDIARY WHERE HD_USCODE=#{userCode} ORDER BY HD_DATE DESC
+</select>
+
+<select id="getPetInfo" parameterType="icia.cnd.petmate.beans.UserBean" >
+SELECT PET.PT_CODE AS petCode, PET.PT_NAME AS petName
+FROM PET
+WHERE PET.PT_USCODE = ${userCode}
+</select>
+<!-- <resultMap id="petMap" type="icia.cnd.petmate.beans.PetBean">
+  <result property="petCode" column="petCode"/>
+  <result property="petName" column="petName"/>
+</resultMap> -->
+
+
+
+
+<select id="getUser" parameterType="icia.cnd.petmate.beans.UserBean" resultType="icia.cnd.petmate.beans.UserBean">
+	SELECT US_CODE AS userCode, US_NAME AS userName, US_MAIL AS userEmail, US_PHONE AS userPhone FROM USERS WHERE US_CODE=#{userCode}
+</select>
+
+
+<update id="updateUser" parameterType="icia.cnd.petmate.beans.UserBean">
+	UPDATE USERS SET US_NAME = #{userName}, US_PHONE = #{userPhone} WHERE US_CODE = #{userCode}
+</update>
+
+<insert id="insPet" parameterType="icia.cnd.petmate.beans.UserBean" >
+	INSERT INTO PT(PT_USCODE, PT_CODE, PT_NAME, PT_BIRTH, PT_CND, PT_SPECIES, PT_NOTE)
+	VALUES (#{userCode}, PET_CODE.NEXTVAL, #{petInfoList[0].petName}, to_date(#{petInfoList[0].petBirth},'YYYY/MM'), #{petInfoList[0].petGender}, #{petInfoList[0].petSpecies}, #{petInfoList[0].petNote})
+</insert>
+
+<resultMap id="petResultMap" type="icia.cnd.petmate.beans.PetBean">
+  <result property="petName" column="petName"/>
+  <result property="petBirth" column="petBirth"/>
+  <result property="petGender" column="petGender"/>
+  <result property="petSpecies" column="petSpecies"/>
+  <result property="petNote" column="petNote"/>
+</resultMap>
+<select id="petList" parameterType="icia.cnd.petmate.beans.UserBean" resultMap="petResultMap">
+	SELECT PT_NAME AS petName, PT_BIRTH AS petBirth, PT_CND AS petGender, PT_SPECIES AS petSpecies, PT_NOTE AS petNote
+	FROM PET
+	WHERE PT_USCODE = #{userCode}
+</select>
+
+
+
+
+
+
+
+
+
+</mapper>

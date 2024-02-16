@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.cnd.petmate.mapper.MgrMapperInter">
+
+<insert id="insAddListH" parameterType="icia.cnd.petmate.beans.StoreBean">
+	INSERT INTO ADDBOARD(AD_STCODE, AD_CODE, AD_TITLE, AD_SUBTITLE, AD_NOTE, AD_IMCODE, AD_PRICE)
+	VALUES(#{storeCode}, 'H'||BOARD_CODE.NEXTVAL, #{addList[0].addTitle}, #{addList[0].addSubTitle}, #{addList[0].addContent}, #{addList[0].addImages}, #{addList[0].addPrice})
+</insert>
+<insert id="insAddListT" parameterType="icia.cnd.petmate.beans.StoreBean">
+	INSERT INTO ADDBOARD(AD_STCODE, AD_CODE, AD_TITLE, AD_SUBTITLE, AD_NOTE, AD_IMCODE, AD_PRICE)
+	VALUES(#{storeCode}, 'T'||BOARD_CODE.NEXTVAL, #{addList[0].addTitle}, #{addList[0].addSubTitle}, #{addList[0].addContent}, #{addList[0].addImages}, #{addList[0].addPrice})
+</insert>
+
+<resultMap id="addResultMap" type="icia.cnd.petmate.beans.PromotionBean">
+  <result property="addCode" column="addCode"/>
+  <result property="addImages" column="addImages"/>
+  <result property="addPrice" column="addPrice"/>
+  <result property="addContent" column="addContent"/>
+  <result property="addSubTitle" column="addSubTitle"/>
+  <result property="addTitle" column="addTitle"/>
+</resultMap>
+
+
+
+<!-- 
+<resultMap id="stcodeList" type="icia.cnd.petmate.beans.ReserveBean">
+	<result property="reStCode" column="reStCode"/>
+</resultMap>
+ <select id="getstcodeList" parameterType="icia.cnd.petmate.beans.UserBean" resultMap="stcodeList">
+SELECT ST_CODE AS reStCode FROM STORE
+</select>  -->
+
+
+<resultMap id="stcodeList" type="icia.cnd.petmate.beans.UserstBean">
+	<result property="stCode" column="stCode"/>
+</resultMap>
+ <select id="getstcodeList" parameterType="icia.cnd.petmate.beans.UserstBean" resultMap="stcodeList">
+SELECT DISTINCT ST_CODE AS stCode FROM STORE WHERE ST_CODE LIKE 'T%'
+</select>  
+
+
+ <select id="getstcodeList2" parameterType="icia.cnd.petmate.beans.UserstBean" resultMap="stcodeList">
+SELECT DISTINCT ST_CODE AS stCode FROM STORE WHERE ST_CODE LIKE 'H%'
+</select>
+
+ <select id="getstcodeList3" parameterType="icia.cnd.petmate.beans.UserstBean" resultMap="stcodeList">
+SELECT DISTINCT ST_CODE AS stCode FROM STORE
+</select>
+
+
+
+
+
+
+
+
+
+<!-- user페이지에서 홍보게시물을 검색하기 위한 -->
+ <select id="getusPromotion" parameterType="icia.cnd.petmate.beans.UserstBean" resultMap="addListMap" >
+SELECT 
+    ST_NAME AS stName,
+    ST_ADDRESS AS stAddress,
+    ST_PHONE AS stPhone,
+    ST_MAIL AS stEmail,
+    AD_CODE AS staddCode,
+ 	AD_TITLE AS staddTitle,
+    AD_SUBTITLE AS staddSubTitle,
+    AD_NOTE AS staddContent,
+    AD_IMCODE AS staddImages,
+    ST_CODE AS stCode
+FROM STORE INNER JOIN ADDBOARD ON STORE.ST_CODE = ADDBOARD.AD_STCODE
+WHERE STORE.ST_CODE IN
+<foreach collection="storeList" item="item" open="(" separator="," close=")">
+    #{item.stCode,jdbcType=NCHAR}
+</foreach>
+</select>
+<resultMap id="addListMap" type="icia.cnd.petmate.beans.UserstBean">
+  <result property="staddCode" column="staddCode"/>
+  <result property="staddContent" column="staddContent"/>
+  <result property="staddSubTitle" column="staddSubTitle"/>
+  <result property="staddTitle" column="staddTitle"/>
+  <result property="staddImages" column="staddImages"/>
+  <result property="stName" column="stName"/>
+  <result property="stAddress" column="stAddress"/>
+  <result property="stPhone" column="stPhone"/>
+  <result property="stEmail" column="stEmail"/>
+  <result property="stCode" column="stCode"/>
+</resultMap>
+
+
+<resultMap id="petList" type="icia.cnd.petmate.beans.PetBean">
+	<result property="petName" column="petName"/>
+	<result property="petCode" column="petCode"/>
+	<result property="petSpecies" column="petSpecies"/>
+	<result property="petBirth" column="petBirth"/>
+</resultMap>
+ <select id="getpetList" parameterType="icia.cnd.petmate.beans.UserBean" resultMap="petList">
+SELECT 
+PT_CODE AS petCode,
+PT_NAME AS petName,
+PT_SPECIES AS petSpecies,
+PT_BIRTH AS petBirth
+FROM PET
+WHERE PT_USCODE = #{userCode}
+</select> 
+
+<select id="getAddInfo" parameterType="icia.cnd.petmate.beans.StoreBean" resultMap="addResultMap">
+	SELECT AD_STCODE AS storeCode, AD_CODE AS addCode, AD_TITLE AS addTitle, AD_SUBTITLE AS addSubTitle, 
+	AD_NOTE AS addContent, AD_IMCODE AS addImages, AD_PRICE AS addPrice
+	FROM ADDBOARD
+	WHERE AD_STCODE=#{storeCode}
+</select>
+
+<select id="getStImage" parameterType="icia.cnd.petmate.beans.StoreBean" resultMap="getstImage">
+SELECT IM_LOCATION AS imageLocation, IM_CODE AS imageCode
+FROM IMAGES
+WHERE IM_STUSCODE = #{storeCode} AND IM_CODE = #{addList.addImages}
+</select>
+<resultMap id="getstImage" type="icia.cnd.petmate.beans.ImagesBean" >
+	<result property="imageLocation" column="imageLocation"/>
+	<result property="imageCode" column="imageCode"/>
+</resultMap>
+
+
+
+
+
+<select id="getStoreInfo" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="icia.cnd.petmate.beans.StoreBean">
+	SELECT ST_CODE AS storeCode, ST_NAME AS storeName, ST_PHONE AS storePhone, ST_ADDRESS AS storeAddress, ST_GRADE AS storeGrade FROM STORE WHERE ST_CODE=#{storeCode}
+</select>
+
+
+<select id="startHome" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="icia.cnd.petmate.beans.StoreBean" >
+SELECT 
+ST_CODE AS storeCode, 
+ST_NAME AS storeName, 
+ST_ADDRESS AS storeAddress
+FROM STORE  
+
+</select>
+
+
+
+
+<!-- <insert id="insImages" parameterType="icia.cnd.petmate.beans.StoreBean">
+	  INSERT ALL
+  	<foreach collection="imageList" item="images" index="idx" separator="">
+    <if test="images != null and images.imageLocation != null">
+      INTO IMAGES(IM_CODE, IM_LOCATION)
+      VALUES('A'|| IMAGE_CODE.NEXTVAL, #{images.imageLocation})
+    </if>
+  </foreach>
+  SELECT * FROM DUAL
+</insert> -->
+	
+<insert id="insImages" parameterType="icia.cnd.petmate.beans.StoreBean">
+  INSERT ALL
+  <foreach collection="imageList" item="images" index="idx" separator="">
+    <if test="imageList != null and images != null">
+      INTO IMAGES(IM_CODE, IM_LOCATION, IM_STUSCODE)
+      VALUES('A'||#{images.imageCode}, #{images.imageLocation}, #{storeCode})
+    </if>
+  </foreach>
+  SELECT * FROM DUAL
+</insert>
+
+
+
+<select id="getImages" parameterType="icia.cnd.petmate.beans.StoreBean" resultMap="imageCodeList">
+SELECT IM_CODE AS imageCode,IM_LOCATION AS imageLocation
+FROM IMAGES
+WHERE IM_STUSCODE = #{storeCode}
+
+</select>
+<resultMap id="imageCodeList" type="icia.cnd.petmate.beans.ImagesBean" >
+	<result property="imageLocation" column="imageLocation"/>
+	<result property="imageCode" column="imageCode"/>
+</resultMap>
+
+
+
+
+
+
+</mapper>

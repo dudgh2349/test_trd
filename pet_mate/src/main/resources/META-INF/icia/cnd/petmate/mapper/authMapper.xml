@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="icia.cnd.petmate.mapper.AuthMapperInter">
+
+	<!-- kakao Login -->
+	<insert id="insAPILogin" parameterType="icia.cnd.petmate.beans.UserBean">
+		INSERT INTO US(US_CODE , US_ID, US_NICK, US_NAME, US_BIRTH, US_PHONE, US_PW, US_MAIL) 
+		VALUES(#{userCode}, #{userId}, #{userNickname}, #{userName}, #{userBirth}, #{userPhone}, #{userPassword} , #{userEmail})
+	</insert>
+	
+	<!-- naver Login -->
+	<insert id="insAPILoginRe" parameterType="icia.cnd.petmate.beans.UserBean">
+		INSERT INTO USERS(US_CODE , US_ID, US_NICK, US_NAME, US_BIRTH, US_PHONE, US_PW, US_MAIL)
+		VALUES(#{userCode}, #{userId}, #{userNickname}, #{userName}, #{userBirth}, #{userPhone}, #{userPassword}, #{userEmail})
+	</insert>
+	
+	
+	<!-- temp테이블 아이디 중복 체크 -->
+	<select id="tempDupChk" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="int">
+		SELECT COUNT(*)
+		FROM DUPCHK
+		WHERE ID=#{storeId} OR MAIL=#{storeEmail}
+	</select>
+	<!-- temp테이블에 아이디 ins -->
+	<insert id="insIdTemp" parameterType="icia.cnd.petmate.beans.StoreBean" >
+		INSERT INTO TEMP(TM_ID) VALUES(#{storeId})
+	</insert>
+	<!-- temp테이블에 이메일 ins -->
+	<insert id="insEmailTemp" parameterType="icia.cnd.petmate.beans.StoreBean" >
+		INSERT INTO TEMP(TM_EMAIL) VALUES(#{storeEmail})
+	</insert>
+
+
+		<!-- storeCode 중복 체크 -->
+	<select id="dupStCode" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="int">
+		SELECT COUNT(*)
+		FROM STORE
+		WHERE ST_CODE=#{storeCode}
+	</select>
+
+<!-- ID를 가지고 userCode 검색 -->
+<select id="selUserCode" parameterType="icia.cnd.petmate.beans.UserBean">
+SELECT US_CODE FROM USERS WHERE US_ID = #{userId}
+</select>
+
+	<!-- store 테이블에 ins -->
+	<insert id="insReg" parameterType="icia.cnd.petmate.beans.StoreBean" >
+		INSERT INTO STORE(ST_CODE, ST_ID, ST_NAME, ST_GRADE, ST_PW, ST_MAIL, ST_PHONE, ST_ADDRESS)
+		VALUES(#{storeCode}, #{storeId}, #{storeName}, #{storeGrade}, #{storePassword}, #{storeEmail}, #{storePhone}, #{storeAddress})
+	</insert>
+	<!-- temp 테이블 del -->
+	<delete id="delTemp" parameterType="icia.cnd.petmate.beans.StoreBean">
+		DELETE FROM TEMP WHERE TM_ID = #{storeId}
+	</delete>
+	<!-- storeId와 pw를 이용해서 storeCode 가져오기 -->
+	<select id="getStoreCode" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="String">
+		SELECT ST_CODE AS STORECODE FROM STORE WHERE ST_ID=#{storeId}
+	</select>
+	
+	<!-- userId를 이용해서 UserCode 가져오기 -->
+	<select id="getUserCode" parameterType="icia.cnd.petmate.beans.UserBean" resultType="String">
+		SELECT US_CODE AS accessCode FROM USERS WHERE US_ID=#{userId}
+	</select>
+	
+	<!-- api로그인시 아이디 존재여부 확인 -->
+	<select id="isUser" parameterType="icia.cnd.petmate.beans.UserBean" resultType="int">
+		SELECT COUNT(*) FROM USERS WHERE US_ID=#{userId}
+	</select>
+	
+	
+	<!-- 아이디 존재여부 확인 -->
+	<select id="selId" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="int">
+		SELECT COUNT(*) FROM STORE WHERE ST_ID=#{storeId}
+	</select>
+	<!-- 비밀번호 존재여부 확인 -->
+	<select id="selPw" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="int">
+		SELECT COUNT(*) FROM STORE WHERE ST_PW=#{storePassword}
+	</select>
+
+<!-- temp테이블에 emailCode 입력 -->
+<update id="insTempCode" parameterType="icia.cnd.petmate.beans.StoreBean">
+	UPDATE TEMP SET TM_EMAIL=#{storeEmail}, TM_CODE=#{emailCode} WHERE TM_ID=#{storeId}
+</update>
+
+<!-- temp테이블에 emailCode 비교 -->
+<select id="selEmailCode" parameterType="icia.cnd.petmate.beans.StoreBean" resultType="int">
+	SELECT COUNT(*) FROM TEMP WHERE TM_CODE=#{emailCode}
+</select>
+
+<!-- accessLog ins -->
+	<insert id="insAccessLog" parameterType="icia.cnd.petmate.beans.AccessLogBean" >
+		INSERT INTO ACCESSLOG(AC_USCODE, AC_DATE, AC_ON)
+		VALUES(#{accessCode}, SYSDATE, #{accessType})
+	</insert>
+	
+<!-- accessLog ins -->
+	<insert id="insAccessLogout" parameterType="icia.cnd.petmate.beans.UserBean" >
+		INSERT INTO ACCESSLOG(AC_USCODE, AC_DATE, AC_ON)
+		VALUES(#{userCode}, SYSDATE, #{accessList[0].accessType})
+	</insert>
+	
+	
+</mapper>
