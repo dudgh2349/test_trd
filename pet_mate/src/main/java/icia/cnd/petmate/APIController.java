@@ -62,6 +62,7 @@ public class APIController {
 		model.addAttribute("storeInfo", store);
 		auth.backController("R20", model);
 		log.info("< {} >", store);
+		System.out.println("hello");
 		return (StoreBean)model.getAttribute("store");
 	}
 	
